@@ -2,7 +2,7 @@ import React from 'react';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer';
 import { categoriesData, partnerBrands, customerReviews } from './data/mockData';
-import { Flame, Zap, ShieldCheck, Truck, RotateCcw, Clock, Star, ShoppingBag, Sparkles, Shield, CreditCard, Gift } from 'lucide-react';
+import { Flame, Zap, ShieldCheck, Truck, RotateCcw, Clock, Star, ShoppingBag, Shield, CreditCard } from 'lucide-react';
 import './App.css';
 
 function App() {
@@ -191,18 +191,23 @@ function App() {
           </div>
 
           <div className="category-card-grid">
-            {categoriesData.slice(0, 6).map((category) => (
-              <div key={category.id} className="category-card">
-                <div className="category-card-header">
-                  <div className="category-card-icon">{category.icon}</div>
-                  <div>
-                    <h3>{category.name}</h3>
-                    {category.badge && <span className="category-badge">{category.badge}</span>}
+            {categoriesData.slice(0, 6).map((category) => {
+              const Icon = category.icon;
+              return (
+                <div key={category.id} className="category-card">
+                  <div className="category-card-header">
+                    <div className="category-card-icon">
+                      <Icon size={18} />
+                    </div>
+                    <div>
+                      <h3>{category.name}</h3>
+                      {category.badge && <span className="category-badge">{category.badge}</span>}
+                    </div>
                   </div>
+                  <p>{category.subcategories.flatMap((group) => group.items).slice(0, 4).join(' · ')}</p>
                 </div>
-                <p>{category.subcategories.flatMap((group) => group.items).slice(0, 4).join(' · ')}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 

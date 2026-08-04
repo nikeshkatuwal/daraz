@@ -168,3 +168,35 @@ export const locationsList = [
   { city: 'Biratnagar', area: 'Main Road / Bargachhi' },
   { city: 'Chitwan', area: 'Narayangadh / Bharatpur' }
 ];
+
+export const partnerBrands = [
+  'Samsung',
+  'Xiaomi',
+  'Nike',
+  'Adidas',
+  'Sony',
+  'Apple',
+  'Philips',
+  'Samsung'
+];
+
+export const customerReviews = [
+  {
+    name: 'Anjali Sharma',
+    location: 'Kathmandu',
+    rating: 4.9,
+    message: 'Fast delivery, great price, and the cart interface made checkout so simple. Highly recommend Daraz Express!'
+  },
+  {
+    name: 'Sagar Rai',
+    location: 'Pokhara',
+    rating: 4.8,
+    message: 'The product selection is fantastic and customer service was responsive. I love the daily deals section.'
+  },
+  {
+    name: 'Priya Khatri',
+    location: 'Biratnagar',
+    rating: 4.7,
+    message: 'Really useful search suggestions and secure payment flow. My orders arrived earlier than expected.'
+  }
+];
