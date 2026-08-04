@@ -1,8 +1,10 @@
+import { Smartphone, ShoppingBag, Home, Tv, Sparkles, ShoppingBasket, Dumbbell } from 'lucide-react';
+
 export const categoriesData = [
   {
     id: 'electronics',
     name: 'Electronics & Devices',
-    icon: 'Smartphone',
+    icon: Smartphone,
     badge: 'Popular',
     subcategories: [
       {
@@ -26,7 +28,7 @@ export const categoriesData = [
   {
     id: 'fashion',
     name: "Fashion & Apparel",
-    icon: 'ShoppingBag',
+    icon: ShoppingBag,
     badge: 'HOT 50% OFF',
     subcategories: [
       {
@@ -46,7 +48,7 @@ export const categoriesData = [
   {
     id: 'home',
     name: 'Home & Lifestyle',
-    icon: 'Home',
+    icon: Home,
     subcategories: [
       {
         title: 'Furniture & Decor',
@@ -65,7 +67,7 @@ export const categoriesData = [
   {
     id: 'appliances',
     name: 'Home Appliances',
-    icon: 'Tv',
+    icon: Tv,
     subcategories: [
       {
         title: 'Large Appliances',
@@ -80,7 +82,7 @@ export const categoriesData = [
   {
     id: 'beauty',
     name: 'Health & Beauty',
-    icon: 'Sparkles',
+    icon: Sparkles,
     badge: 'New',
     subcategories: [
       {
@@ -96,7 +98,7 @@ export const categoriesData = [
   {
     id: 'groceries',
     name: 'Groceries & Mart',
-    icon: 'ShoppingBasket',
+    icon: ShoppingBasket,
     subcategories: [
       {
         title: 'Daily Essentials',
@@ -111,7 +113,7 @@ export const categoriesData = [
   {
     id: 'sports',
     name: 'Sports & Outdoor',
-    icon: 'Dumbbell',
+    icon: Dumbbell,
     subcategories: [
       {
         title: 'Fitness Gear',
