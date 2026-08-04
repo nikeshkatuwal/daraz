@@ -1,9 +1,6 @@
 import React from 'react';
 import {
-    Facebook,
-    Instagram,
-    Twitter,
-    Youtube,
+    Share2,
     Mail,
     Phone,
     MapPin,
@@ -69,17 +66,17 @@ export default function Footer() {
                 <div className="footer-col">
                     <div className="footer-heading">Connect & Download</div>
                     <div className="footer-social-icons">
-                        <a href="#facebook" aria-label="Facebook">
-                            <Facebook size={18} />
+                        <a href="#share" aria-label="Share">
+                            <Share2 size={18} />
                         </a>
-                        <a href="#instagram" aria-label="Instagram">
-                            <Instagram size={18} />
+                        <a href="#mail" aria-label="Email">
+                            <Mail size={18} />
                         </a>
-                        <a href="#twitter" aria-label="Twitter">
-                            <Twitter size={18} />
+                        <a href="#phone" aria-label="Phone">
+                            <Phone size={18} />
                         </a>
-                        <a href="#youtube" aria-label="YouTube">
-                            <Youtube size={18} />
+                        <a href="#location" aria-label="Location">
+                            <MapPin size={18} />
                         </a>
                     </div>
                     <div className="footer-app-badges">
