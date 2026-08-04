@@ -2,6 +2,7 @@
   "name": "daraz",
   "private": true,
   "version": "0.0.0",
+  "description": "Daraz-inspired online shopping website built with React, Vite, and Lucide icons.",
   "type": "module",
   "scripts": {
     "dev": "vite",
