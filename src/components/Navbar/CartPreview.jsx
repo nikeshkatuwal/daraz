@@ -1,19 +1,31 @@
 import React from 'react';
+import { useShop } from '../../context/ShopContext';
 import { ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
 
-export default function CartPreview({ cartItems, onUpdateQuantity, onRemoveItem }) {
+export default function CartPreview() {
+  const {
+    cart,
+    cartItemsCount,
+    cartSubtotal,
+    updateCartQuantity,
+    removeFromCart,
+    setIsCheckoutOpen
+  } = useShop();
+
   const freeShippingThreshold = 10000;
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const progressPercent = Math.min(100, Math.round((subtotal / freeShippingThreshold) * 100));
-  const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
+  const progressPercent = Math.min(100, Math.round((cartSubtotal / freeShippingThreshold) * 100));
+  const remainingForFreeShipping = Math.max(0, freeShippingThreshold - cartSubtotal);
 
   return (
     <div className="cart-preview-popover">
       {/* Header */}
       <div className="cart-preview-header">
-        <span className="cart-preview-title">Shopping Cart</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <ShoppingBag size={16} style={{ color: '#f57224' }} />
+          <span className="cart-preview-title">Shopping Cart</span>
+        </div>
         <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>
-          {cartItems.reduce((sum, item) => sum + item.quantity, 0)} Items
+          {cartItemsCount} {cartItemsCount === 1 ? 'Item' : 'Items'}
         </span>
       </div>
 
@@ -36,27 +48,35 @@ export default function CartPreview({ cartItems, onUpdateQuantity, onRemoveItem 
 
       {/* Cart Items List */}
       <div className="cart-items-scroll">
-        {cartItems.length === 0 ? (
-          <div style={{ padding: '24px 0', textAlign: 'center', color: '#94a3b8' }}>
-            <ShoppingBag size={36} style={{ marginBottom: 8, opacity: 0.5 }} />
-            <p style={{ margin: 0, fontSize: '0.84rem' }}>Your shopping cart is empty</p>
+        {cart.length === 0 ? (
+          <div style={{ padding: '28px 0', textAlign: 'center', color: '#94a3b8' }}>
+            <ShoppingBag size={36} style={{ marginBottom: 8, opacity: 0.4 }} />
+            <p style={{ margin: 0, fontSize: '0.86rem', fontWeight: 600 }}>
+              Your shopping cart is empty
+            </p>
+            <span style={{ fontSize: '0.74rem', color: '#cbd5e1' }}>
+              Explore hot deals & flash sales
+            </span>
           </div>
         ) : (
-          cartItems.map((item) => (
-            <div key={item.id} className="cart-item-card">
-              <img src={item.image} alt={item.name} className="cart-item-img" />
+          cart.map((item) => (
+            <div key={`${item.id}-${item.color}`} className="cart-item-card">
+              <img src={item.image} alt={item.title} className="cart-item-img" />
               <div className="cart-item-details">
-                <span className="cart-item-name">{item.name}</span>
+                <span className="cart-item-name">{item.title}</span>
                 <span className="cart-item-meta">
-                  Variant: {item.color} | {item.seller}
+                  Variant: {item.color} {item.size ? `• Size: ${item.size}` : ''}
                 </span>
                 <div className="cart-item-price-qty">
-                  <span className="cart-item-price">Rs. {item.price.toLocaleString()}</span>
+                  <span className="cart-item-price">
+                    Rs. {(item.price * item.quantity).toLocaleString()}
+                  </span>
                   <div className="qty-control">
                     <button
                       type="button"
                       className="qty-btn"
-                      onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                      onClick={() => updateCartQuantity(item.id, item.quantity - 1)}
+                      aria-label="Decrease quantity"
                     >
                       -
                     </button>
@@ -64,7 +84,8 @@ export default function CartPreview({ cartItems, onUpdateQuantity, onRemoveItem 
                     <button
                       type="button"
                       className="qty-btn"
-                      onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => updateCartQuantity(item.id, item.quantity + 1)}
+                      aria-label="Increase quantity"
                     >
                       +
                     </button>
@@ -73,17 +94,18 @@ export default function CartPreview({ cartItems, onUpdateQuantity, onRemoveItem 
               </div>
               <button
                 type="button"
-                onClick={() => onRemoveItem(item.id)}
+                onClick={() => removeFromCart(item.id)}
                 style={{
                   background: 'none',
                   border: 'none',
                   color: '#94a3b8',
                   cursor: 'pointer',
-                  padding: 4
+                  padding: 4,
+                  alignSelf: 'flex-start'
                 }}
                 title="Remove item"
               >
-                <Trash2 size={14} />
+                <Trash2 size={15} />
               </button>
             </div>
           ))
@@ -91,15 +113,19 @@ export default function CartPreview({ cartItems, onUpdateQuantity, onRemoveItem 
       </div>
 
       {/* Footer & Checkout */}
-      {cartItems.length > 0 && (
+      {cart.length > 0 && (
         <div className="cart-preview-footer">
           <div className="cart-subtotal-row">
             <span className="subtotal-label">Subtotal</span>
-            <span className="subtotal-amount">Rs. {subtotal.toLocaleString()}</span>
+            <span className="subtotal-amount">Rs. {cartSubtotal.toLocaleString()}</span>
           </div>
           <div className="cart-footer-actions">
-            <button type="button" className="btn-checkout">
-              Proceed to Checkout <ArrowRight size={14} style={{ inlineSize: 'auto' }} />
+            <button
+              type="button"
+              className="btn-checkout"
+              onClick={() => setIsCheckoutOpen(true)}
+            >
+              Proceed to Checkout <ArrowRight size={15} />
             </button>
           </div>
         </div>

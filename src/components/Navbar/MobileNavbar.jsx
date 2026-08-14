@@ -1,13 +1,38 @@
 import React, { useState } from 'react';
-import { Menu, X, ShoppingBag, Search, User, MapPin, Heart } from 'lucide-react';
+import { Menu, X, ShoppingBag, Search, User, MapPin, Heart, Flame, Gift } from 'lucide-react';
 import { categoriesData } from '../../data/mockData';
+import { useShop } from '../../context/ShopContext';
 
-export default function MobileNavbar({
-  currentLocation,
-  cartCount,
-  onOpenLocationModal
-}) {
+export default function MobileNavbar() {
+  const {
+    setIsLocationModalOpen,
+    cartItemsCount,
+    setIsCheckoutOpen,
+    wishlist,
+    setIsWishlistOpen,
+    setIsAuthOpen,
+    user,
+    searchQuery,
+    setSearchQuery,
+    selectedCategory,
+    setSelectedCategory
+  } = useShop();
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const el = document.getElementById('catalog-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleCategoryClick = (catId) => {
+    setSelectedCategory(catId);
+    setSearchQuery('');
+    setIsDrawerOpen(false);
+    const el = document.getElementById('catalog-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <div className="mobile-navbar">
@@ -16,141 +41,185 @@ export default function MobileNavbar({
         <button
           type="button"
           onClick={() => setIsDrawerOpen(true)}
-          style={{ background: 'none', border: 'none', color: '#0f172a', padding: 4 }}
+          className="mobile-icon-btn"
+          aria-label="Open menu"
         >
           <Menu size={22} />
         </button>
 
-        <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div
-            style={{
-              background: '#f57224',
-              color: 'white',
-              borderRadius: 8,
-              width: 28,
-              height: 28,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
+        <a href="/" className="mobile-brand-link">
+          <div className="mobile-brand-icon">
             <ShoppingBag size={16} />
           </div>
-          <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#1e293b' }}>
-            daraz<span style={{ color: '#f57224' }}>express</span>
+          <span className="mobile-brand-title">
+            daraz<span>express</span>
           </span>
         </a>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div className="mobile-actions-cluster">
           <button
             type="button"
-            onClick={onOpenLocationModal}
-            style={{ background: 'none', border: 'none', color: '#64748b' }}
+            onClick={() => setIsLocationModalOpen(true)}
+            className="mobile-icon-btn"
+            title="Location"
+            aria-label="Select location"
           >
-            <MapPin size={20} />
+            <MapPin size={19} />
           </button>
-          <div style={{ position: 'relative' }}>
-            <ShoppingBag size={22} style={{ color: '#f57224' }} />
-            {cartCount > 0 && <span className="badge-count">{cartCount}</span>}
-          </div>
+
+          <button
+            type="button"
+            onClick={() => setIsWishlistOpen(true)}
+            className="mobile-icon-btn relative"
+            title="Wishlist"
+            aria-label="Wishlist"
+          >
+            <Heart size={19} />
+            {wishlist.length > 0 && <span className="badge-count">{wishlist.length}</span>}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsCheckoutOpen(true)}
+            className="mobile-icon-btn relative"
+            title="Cart"
+            aria-label="Cart"
+          >
+            <ShoppingBag size={21} style={{ color: '#f57224' }} />
+            {cartItemsCount > 0 && <span className="badge-count">{cartItemsCount}</span>}
+          </button>
         </div>
       </div>
 
       {/* Mobile Search Row */}
-      <div className="mobile-search-row">
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            background: '#f1f5f9',
-            borderRadius: 20,
-            padding: '6px 14px',
-            gap: 8
-          }}
-        >
+      <form onSubmit={handleSearchSubmit} className="mobile-search-row">
+        <div className="mobile-search-box">
           <Search size={16} style={{ color: '#94a3b8' }} />
           <input
             type="text"
-            placeholder="Search items in Daraz..."
-            style={{
-              border: 'none',
-              background: 'transparent',
-              outline: 'none',
-              width: '100%',
-              fontSize: '0.84rem'
-            }}
+            placeholder="Search in Daraz Express..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
+          {searchQuery && (
+            <button
+              type="button"
+              className="search-clear-mini"
+              onClick={() => setSearchQuery('')}
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
-      </div>
+      </form>
 
       {/* Mobile Slide Drawer Overlay */}
       {isDrawerOpen && (
         <div className="mobile-drawer-overlay" onClick={() => setIsDrawerOpen(false)}>
           <div className="mobile-drawer" onClick={(e) => e.stopPropagation()}>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                paddingBottom: 12,
-                borderBottom: '1px solid #e2e8f0'
-              }}
-            >
-              <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f57224' }}>
-                Daraz Menu
-              </span>
-              <button
-                type="button"
-                onClick={() => setIsDrawerOpen(false)}
-                style={{ background: 'none', border: 'none', color: '#64748b' }}
-              >
-                <X size={20} />
-              </button>
+            <div className="drawer-top-banner">
+              <div className="drawer-brand-row">
+                <span className="drawer-brand-text">
+                  daraz<span>express</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsDrawerOpen(false)}
+                  className="mobile-icon-btn"
+                  aria-label="Close menu"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* User Profile / Login Box */}
+              <div className="drawer-user-card">
+                <div className="drawer-user-info">
+                  <div className="user-circle">
+                    <User size={20} />
+                  </div>
+                  <div>
+                    <strong>{user.isLoggedIn ? user.name : 'Welcome to Daraz!'}</strong>
+                    <span>
+                      {user.isLoggedIn
+                        ? `Wallet: Rs. ${user.walletBalance}`
+                        : 'Sign in for member perks'}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="btn-drawer-login"
+                  onClick={() => {
+                    setIsDrawerOpen(false);
+                    setIsAuthOpen(true);
+                  }}
+                >
+                  {user.isLoggedIn ? 'MY PROFILE' : 'SIGN IN / REGISTER'}
+                </button>
+              </div>
             </div>
 
-            <div style={{ padding: '16px 0', borderBottom: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b' }}>
-                Welcome to Daraz!
-              </div>
-              <div style={{ fontSize: '0.78rem', color: '#64748b', margin: '4px 0 12px 0' }}>
-                Sign in to manage orders & vouchers
-              </div>
+            {/* Quick Links */}
+            <div className="drawer-nav-section">
+              <div className="drawer-section-heading">Quick Actions</div>
               <button
                 type="button"
-                style={{
-                  width: '100%',
-                  background: '#f57224',
-                  color: 'white',
-                  border: 'none',
-                  padding: 8,
-                  borderRadius: 6,
-                  fontWeight: 700,
-                  fontSize: '0.84rem'
+                className="drawer-nav-item"
+                onClick={() => {
+                  setIsDrawerOpen(false);
+                  const el = document.getElementById('flash-sale-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
-                SIGN IN / REGISTER
+                <Flame size={18} style={{ color: '#f57224' }} />
+                <span>Flash Sale & Deals</span>
+              </button>
+              <button
+                type="button"
+                className="drawer-nav-item"
+                onClick={() => {
+                  setIsDrawerOpen(false);
+                  setIsWishlistOpen(true);
+                }}
+              >
+                <Heart size={18} style={{ color: '#ef4444' }} />
+                <span>My Wishlist ({wishlist.length})</span>
+              </button>
+              <button
+                type="button"
+                className="drawer-nav-item"
+                onClick={() => {
+                  setIsDrawerOpen(false);
+                  const el = document.getElementById('vouchers-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                <Gift size={18} style={{ color: '#10b981' }} />
+                <span>Collect Vouchers</span>
               </button>
             </div>
 
-            <div style={{ padding: '12px 0' }}>
-              <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginBottom: 8 }}>
-                Categories
-              </div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                {categoriesData.map((cat) => (
-                  <li
-                    key={cat.id}
-                    style={{
-                      padding: '8px 0',
-                      fontSize: '0.86rem',
-                      fontWeight: 600,
-                      color: '#334155',
-                      borderBottom: '1px solid #f8fafc'
-                    }}
-                  >
-                    {cat.name}
-                  </li>
-                ))}
+            {/* Categories List */}
+            <div className="drawer-nav-section">
+              <div className="drawer-section-heading">Categories</div>
+              <ul className="drawer-category-list">
+                {categoriesData.map((cat) => {
+                  const Icon = cat.icon || ShoppingBag;
+                  const isSelected = selectedCategory === cat.id;
+                  return (
+                    <li key={cat.id}>
+                      <button
+                        type="button"
+                        className={`drawer-cat-btn ${isSelected ? 'active' : ''}`}
+                        onClick={() => handleCategoryClick(cat.id)}
+                      >
+                        <Icon size={16} />
+                        <span>{cat.name}</span>
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </div>

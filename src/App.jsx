@@ -1,277 +1,449 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { ShopProvider, useShop } from './context/ShopContext';
 import Navbar from './components/Navbar/Navbar';
 import Footer from './components/Footer';
+import HeroCarousel from './components/HeroCarousel';
+import VoucherBanner from './components/VoucherBanner';
+import ProductCard from './components/ProductCard';
+import ProductDetailModal from './components/ProductDetailModal';
+import WishlistModal from './components/WishlistModal';
+import CheckoutModal from './components/CheckoutModal';
+import AuthModal from './components/AuthModal';
+import OrderTrackingModal from './components/OrderTrackingModal';
+import ToastNotification from './components/ToastNotification';
+import MobileBottomNav from './components/MobileBottomNav';
 import { categoriesData, partnerBrands, customerReviews } from './data/mockData';
-import { Flame, Zap, ShieldCheck, Truck, RotateCcw, Clock, Star, ShoppingBag, Shield, CreditCard } from 'lucide-react';
+import {
+  Flame,
+  Zap,
+  ShieldCheck,
+  Truck,
+  RotateCcw,
+  Clock,
+  Star,
+  ShoppingBag,
+  ArrowUpDown,
+  X,
+  Sparkles,
+  Award,
+  CheckCircle2
+} from 'lucide-react';
 import './App.css';
 
-function App() {
-  const benefitCards = [
-    {
-      title: 'Guaranteed Authenticity',
-      description: 'Verified sellers and strict quality checks on every order.',
-      icon: ShieldCheck
-    },
-    {
-      title: 'Fast Express Delivery',
-      description: 'Same-day and next-day delivery options in major cities.',
-      icon: Truck
-    },
-    {
-      title: 'Safe Payment Options',
-      description: 'Cash on delivery, cards, e-wallets and secure checkout.',
-      icon: CreditCard
-    }
-  ];
+function StoreMain() {
+  const {
+    filteredProducts,
+    allProducts,
+    selectedCategory,
+    setSelectedCategory,
+    searchQuery,
+    setSearchQuery,
+    sortBy,
+    setSortBy,
+    filterMallOnly,
+    setFilterMallOnly,
+    filterFreeShipping,
+    setFilterFreeShipping
+  } = useShop();
 
-  const featuredProducts = [
-    {
-      id: 1,
-      title: 'Ultra-thin Noise Cancelling Wireless Headphones',
-      price: 4999,
-      originalPrice: 7999,
-      discount: '-37%',
-      rating: 4.8,
-      reviews: 142,
-      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&auto=format&fit=crop&q=80',
-      tag: 'Flash Sale'
-    },
-    {
-      id: 2,
-      title: 'Waterproof Smartwatch with Heart Rate Monitor',
-      price: 2850,
-      originalPrice: 4200,
-      discount: '-32%',
-      rating: 4.9,
-      reviews: 98,
-      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=80',
-      tag: 'Daraz Mall'
-    },
-    {
-      id: 3,
-      title: 'Pro Mechanical Gaming Keyboard RGB Backlit',
-      price: 3490,
-      originalPrice: 5990,
-      discount: '-41%',
-      rating: 4.7,
-      reviews: 215,
-      image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500&auto=format&fit=crop&q=80',
-      tag: 'Best Seller'
-    },
-    {
-      id: 4,
-      title: 'Ergonomic Wireless Mouse with Silent Click',
-      price: 1250,
-      originalPrice: 2100,
-      discount: '-40%',
-      rating: 4.6,
-      reviews: 87,
-      image: 'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500&auto=format&fit=crop&q=80',
-      tag: 'Top Choice'
-    }
-  ];
+  // Flash Sale Live Countdown Timer
+  const [timeLeft, setTimeLeft] = useState({
+    hours: 5,
+    minutes: 42,
+    seconds: 18
+  });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev.seconds > 0) {
+          return { ...prev, seconds: prev.seconds - 1 };
+        } else if (prev.minutes > 0) {
+          return { ...prev, minutes: 59, seconds: 59 };
+        } else if (prev.hours > 0) {
+          return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
+        }
+        return { hours: 6, minutes: 0, seconds: 0 };
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const flashSaleProducts = allProducts.filter((p) => p.isFlashSale).slice(0, 4);
+
+  const formatDigits = (num) => String(num).padStart(2, '0');
+
+  const activeCategoryObj = categoriesData.find((c) => c.id === selectedCategory) || {
+    name: 'All Categories'
+  };
+
+  const handleResetFilters = () => {
+    setSelectedCategory('all');
+    setSearchQuery('');
+    setFilterMallOnly(false);
+    setFilterFreeShipping(false);
+    setSortBy('popular');
+  };
+
+  const hasActiveFilters =
+    selectedCategory !== 'all' ||
+    searchQuery.trim() !== '' ||
+    filterMallOnly ||
+    filterFreeShipping ||
+    sortBy !== 'popular';
 
   return (
-    <div className="app-main-layout">
-      {/* 1. Feature-Rich Online Shopping Navbar */}
-      <Navbar />
-
-      {/* 2. Main Store Body Demo Content */}
-      <main className="store-container">
-        {/* Trust Badges Bar */}
-        <section className="trust-bar">
-          <div className="trust-item">
+    <main className="store-container">
+      {/* 1. Trust & Value Proposition Bar */}
+      <section className="trust-bar">
+        <div className="trust-item">
+          <div className="trust-icon-box">
             <ShieldCheck size={20} className="trust-icon" />
-            <div>
-              <strong>100% Genuine Products</strong>
-              <span>Verified Direct Brand Distributors</span>
-            </div>
           </div>
-          <div className="trust-item">
+          <div>
+            <strong>100% Genuine Products</strong>
+            <span>Direct from verified brand stores</span>
+          </div>
+        </div>
+        <div className="trust-item">
+          <div className="trust-icon-box">
             <Truck size={20} className="trust-icon" />
-            <div>
-              <strong>Fast Countrywide Delivery</strong>
-              <span>Express Shipping to 60+ Cities</span>
-            </div>
           </div>
-          <div className="trust-item">
+          <div>
+            <strong>Fast Express Delivery</strong>
+            <span>Coverage in 60+ cities across Nepal</span>
+          </div>
+        </div>
+        <div className="trust-item">
+          <div className="trust-icon-box">
             <RotateCcw size={20} className="trust-icon" />
-            <div>
-              <strong>7 Days Easy Returns</strong>
-              <span>Hassle-free 100% Refund Policy</span>
-            </div>
           </div>
-          <div className="trust-item">
+          <div>
+            <strong>7 Days Easy Returns</strong>
+            <span>Hassle-free 100% refund policy</span>
+          </div>
+        </div>
+        <div className="trust-item">
+          <div className="trust-icon-box">
             <Zap size={20} className="trust-icon" />
+          </div>
+          <div>
+            <strong>Safe Digital Payments</strong>
+            <span>eSewa, Khalti, Cards & Cash on Delivery</span>
+          </div>
+        </div>
+      </section>
+
+      {/* 2. Dynamic Hero Carousel */}
+      <HeroCarousel />
+
+      {/* 3. Interactive Voucher Hub */}
+      <div id="vouchers-section">
+        <VoucherBanner />
+      </div>
+
+      {/* 4. Live Flash Sale Section */}
+      <section id="flash-sale-section" className="flash-sale-section">
+        <div className="flash-sale-header">
+          <div className="flash-title">
+            <div className="flame-icon-box">
+              <Flame size={22} style={{ color: '#ffffff' }} />
+            </div>
             <div>
-              <strong>Safe & Secure Checkout</strong>
-              <span>eSewa, Khalti, Cards & Cash on Delivery</span>
-            </div>
-          </div>
-        </section>
-
-        {/* Hero Banner Section */}
-        <section className="hero-banner">
-          <div className="hero-content">
-            <span className="hero-badge">🔥 DARAZ MEGA SALE 2026</span>
-            <h1>Up to 70% OFF on Top Electronics & Fashion</h1>
-            <p>Enjoy extra Bank Voucher discounts + Free Express Delivery on selected items.</p>
-            <div className="hero-actions">
-              <button className="btn-hero-primary">Shop Mega Deals</button>
-              <button className="btn-hero-secondary">Collect Vouchers</button>
-            </div>
-          </div>
-        </section>
-
-        {/* Flash Sale Section */}
-        <section className="flash-sale-section">
-          <div className="flash-sale-header">
-            <div className="flash-title">
-              <Flame size={24} style={{ color: '#f57224' }} />
               <h2>Flash Sale</h2>
-              <div className="timer-box">
-                <Clock size={14} />
-                <span>Ends in <strong>04 : 28 : 12</strong></span>
+              <span className="flash-sublabel">Limited stock lightning discounts</span>
+            </div>
+
+            {/* Countdown Box */}
+            <div className="timer-box">
+              <Clock size={15} />
+              <span>Ends in</span>
+              <div className="countdown-badges">
+                <span className="digit-box">{formatDigits(timeLeft.hours)}</span>
+                <span className="colon">:</span>
+                <span className="digit-box">{formatDigits(timeLeft.minutes)}</span>
+                <span className="colon">:</span>
+                <span className="digit-box">{formatDigits(timeLeft.seconds)}</span>
               </div>
             </div>
-            <button className="btn-view-all">SHOP MORE &gt;</button>
           </div>
 
-          <div className="products-grid">
-            {featuredProducts.map((prod) => (
-              <div key={prod.id} className="product-card">
-                <div className="product-img-wrapper">
-                  <img src={prod.image} alt={prod.title} />
-                  <span className="product-tag">{prod.tag}</span>
-                  <span className="discount-badge">{prod.discount}</span>
-                </div>
-                <div className="product-info">
-                  <h3 className="product-title">{prod.title}</h3>
-                  <div className="product-rating">
-                    <Star size={12} fill="#f59e0b" color="#f59e0b" />
-                    <span>{prod.rating} ({prod.reviews})</span>
-                  </div>
-                  <div className="product-price-row">
-                    <span className="current-price">Rs. {prod.price.toLocaleString()}</span>
-                    <span className="original-price">Rs. {prod.originalPrice.toLocaleString()}</span>
-                  </div>
-                  <button className="btn-add-cart">
-                    <ShoppingBag size={14} /> Add to Cart
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+          <button
+            type="button"
+            className="btn-view-all"
+            onClick={() => {
+              setSelectedCategory('all');
+              const el = document.getElementById('catalog-section');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            VIEW ALL DEALS &gt;
+          </button>
+        </div>
 
-        {/* Benefits Highlights */}
-        <section className="benefits-grid">
-          {benefitCards.map((benefit) => {
-            const Icon = benefit.icon;
+        {/* Flash Sale Product Cards Grid */}
+        <div className="products-grid flash-products-grid">
+          {flashSaleProducts.map((prod) => (
+            <ProductCard key={prod.id} product={prod} />
+          ))}
+        </div>
+      </section>
+
+      {/* 5. Popular Categories Visual Navigator */}
+      <section className="featured-categories-section">
+        <div className="section-heading-row">
+          <div>
+            <span className="section-label">Browse By Department</span>
+            <h2>Explore Top Categories</h2>
+          </div>
+        </div>
+
+        <div className="category-card-grid">
+          {categoriesData.map((category) => {
+            const Icon = category.icon;
+            const isSelected = selectedCategory === category.id;
             return (
-              <div key={benefit.title} className="benefit-card">
-                <div className="benefit-icon-wrapper">
-                  <Icon size={20} />
+              <button
+                key={category.id}
+                type="button"
+                className={`category-card-btn ${isSelected ? 'selected' : ''}`}
+                onClick={() => {
+                  setSelectedCategory(category.id);
+                  const el = document.getElementById('catalog-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                <div className="category-card-icon">
+                  <Icon size={22} />
                 </div>
-                <h3>{benefit.title}</h3>
-                <p>{benefit.description}</p>
-              </div>
+                <div className="category-card-text">
+                  <h3>{category.name}</h3>
+                  {category.badge && (
+                    <span className="category-badge">{category.badge}</span>
+                  )}
+                </div>
+              </button>
             );
           })}
-        </section>
+        </div>
+      </section>
 
-        {/* Featured Categories */}
-        <section className="featured-categories-section">
-          <div className="section-heading-row">
-            <div>
-              <span className="section-label">Shop Collections</span>
-              <h2>Popular Categories</h2>
+      {/* 6. Main Catalog & Interactive Filtering Section */}
+      <section id="catalog-section" className="catalog-section">
+        {/* Catalog Filter Controls Header */}
+        <div className="catalog-header-bar">
+          <div className="catalog-title-group">
+            <h2>
+              {searchQuery ? `Search Results for "${searchQuery}"` : activeCategoryObj.name}
+            </h2>
+            <span className="results-count">
+              Showing <strong>{filteredProducts.length}</strong> items
+            </span>
+          </div>
+
+          {/* Controls Cluster (Sort, Filters, Reset) */}
+          <div className="catalog-controls-cluster">
+            {/* Mall Filter Toggle */}
+            <button
+              type="button"
+              className={`filter-toggle-btn ${filterMallOnly ? 'active' : ''}`}
+              onClick={() => setFilterMallOnly(!filterMallOnly)}
+            >
+              <ShieldCheck size={14} /> Daraz Mall Only
+            </button>
+
+            {/* Free Shipping Filter Toggle */}
+            <button
+              type="button"
+              className={`filter-toggle-btn ${filterFreeShipping ? 'active' : ''}`}
+              onClick={() => setFilterFreeShipping(!filterFreeShipping)}
+            >
+              <Truck size={14} /> Free Delivery
+            </button>
+
+            {/* Sort Dropdown */}
+            <div className="sort-dropdown-wrap">
+              <ArrowUpDown size={14} style={{ color: '#64748b' }} />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="sort-select"
+              >
+                <option value="popular">Most Popular</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="rating">Top Customer Rating</option>
+                <option value="discount">Biggest Discount</option>
+              </select>
             </div>
-            <button className="btn-view-all alt">View All Categories</button>
-          </div>
 
-          <div className="category-card-grid">
-            {categoriesData.slice(0, 6).map((category) => {
-              const Icon = category.icon;
-              return (
-                <div key={category.id} className="category-card">
-                  <div className="category-card-header">
-                    <div className="category-card-icon">
-                      <Icon size={18} />
-                    </div>
-                    <div>
-                      <h3>{category.name}</h3>
-                      {category.badge && <span className="category-badge">{category.badge}</span>}
-                    </div>
-                  </div>
-                  <p>{category.subcategories.flatMap((group) => group.items).slice(0, 4).join(' · ')}</p>
-                </div>
-              );
-            })}
+            {/* Clear Filters Button */}
+            {hasActiveFilters && (
+              <button
+                type="button"
+                className="btn-clear-filters"
+                onClick={handleResetFilters}
+                title="Reset all active filters"
+              >
+                <X size={14} /> Reset
+              </button>
+            )}
           </div>
-        </section>
+        </div>
 
-        {/* Trusted Brands */}
-        <section className="brand-strip-section">
-          <div className="section-heading-row">
-            <div>
-              <span className="section-label">Trusted by Millions</span>
-              <h2>Top Brands Available</h2>
-            </div>
-          </div>
-          <div className="brand-strip">
-            {partnerBrands.map((brand) => (
-              <div key={brand} className="brand-pill">
-                {brand}
-              </div>
+        {/* Dynamic Products Grid */}
+        {filteredProducts.length > 0 ? (
+          <div className="products-grid main-catalog-grid">
+            {filteredProducts.map((prod) => (
+              <ProductCard key={prod.id} product={prod} />
             ))}
           </div>
-        </section>
-
-        {/* Customer Reviews */}
-        <section className="reviews-section">
-          <div className="section-heading-row">
-            <div>
-              <span className="section-label">Customer Love</span>
-              <h2>What Shoppers Are Saying</h2>
-            </div>
+        ) : (
+          <div className="catalog-empty-state">
+            <ShoppingBag size={48} style={{ color: '#94a3b8', opacity: 0.5 }} />
+            <h3>No products match your current filters</h3>
+            <p>Try clearing your search query or selecting a different category.</p>
+            <button
+              type="button"
+              className="btn-reset-large"
+              onClick={handleResetFilters}
+            >
+              Reset Filters & Show All
+            </button>
           </div>
-          <div className="review-card-grid">
-            {customerReviews.map((review) => (
-              <div key={review.name} className="review-card">
+        )}
+      </section>
+
+      {/* 7. Official Brand Partners Showcase */}
+      <section className="brand-strip-section">
+        <div className="section-heading-row">
+          <div>
+            <span className="section-label">Official Flagship Stores</span>
+            <h2>Trusted Partner Brands</h2>
+          </div>
+          <div className="mall-guarantee-pill">
+            <Award size={15} /> 100% Authentic Guarantee
+          </div>
+        </div>
+        <div className="brand-strip">
+          {partnerBrands.map((brand, index) => (
+            <div
+              key={`${brand}-${index}`}
+              className="brand-pill"
+              onClick={() => {
+                setSearchQuery(brand);
+                const el = document.getElementById('catalog-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              <ShieldCheck size={14} style={{ color: '#f57224' }} />
+              <span>{brand}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 8. Customer Reviews & Ratings */}
+      <section className="reviews-section">
+        <div className="section-heading-row">
+          <div>
+            <span className="section-label">Real Experiences</span>
+            <h2>What Shoppers Across Nepal Are Saying</h2>
+          </div>
+        </div>
+        <div className="review-card-grid">
+          {customerReviews.map((review) => (
+            <div key={review.name} className="review-card">
+              <div className="review-header">
                 <div className="review-rating">
-                  <Star size={14} fill="#f59e0b" color="#f59e0b" />
-                  <span>{review.rating.toFixed(1)}</span>
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      size={14}
+                      fill={i < Math.floor(review.rating) ? '#f59e0b' : '#e2e8f0'}
+                      color={i < Math.floor(review.rating) ? '#f59e0b' : '#e2e8f0'}
+                    />
+                  ))}
+                  <span className="rating-text">{review.rating.toFixed(1)}</span>
                 </div>
-                <p>{review.message}</p>
-                <div className="review-author">
-                  <span>{review.name}</span>
-                  <span>{review.location}</span>
+                <span className="review-date">{review.date}</span>
+              </div>
+              <p className="review-body">"{review.message}"</p>
+              <div className="review-author">
+                <div>
+                  <strong>{review.name}</strong>
+                  <span className="review-loc">{review.location}, Nepal</span>
+                </div>
+                <div className="verified-badge">
+                  <CheckCircle2 size={13} /> Verified Buyer
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Newsletter CTA */}
-        <section className="newsletter-section">
-          <div className="newsletter-card">
-            <div>
-              <span className="section-label">Stay Updated</span>
-              <h2>Get the Latest Deals & Promo Codes</h2>
-              <p>Subscribe for early access to sales, new arrivals, and app-only vouchers.</p>
             </div>
-            <div className="newsletter-form">
-              <input type="email" placeholder="Enter your email address" />
-              <button type="button">Subscribe Now</button>
-            </div>
-          </div>
-        </section>
-      </main>
+          ))}
+        </div>
+      </section>
 
-      <Footer />
-    </div>
+      {/* 9. Newsletter & App Discount Banner */}
+      <section className="newsletter-section">
+        <div className="newsletter-card">
+          <div className="newsletter-text-block">
+            <span className="newsletter-tag">
+              <Sparkles size={14} /> VIP SHOPPER CLUB
+            </span>
+            <h2>Get Rs. 500 Welcome Discount On First Order</h2>
+            <p>
+              Join 1M+ smart shoppers. Receive secret coupon codes, early Flash Sale notifications & free delivery perks.
+            </p>
+          </div>
+          <div className="newsletter-form-block">
+            <div className="newsletter-form-row">
+              <input type="email" placeholder="Enter your email address..." />
+              <button type="button">Claim Rs. 500</button>
+            </div>
+            <span className="newsletter-note">
+              🔒 Instant coupon code delivered to your email inbox. No spam ever.
+            </span>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
 
-export default App;
+export default function App() {
+  return (
+    <ShopProvider>
+      <div className="app-main-layout">
+        {/* Dynamic Toast Feedback Overlay */}
+        <ToastNotification />
+
+        {/* 1. Feature-Rich Online Shopping Navbar */}
+        <Navbar />
+
+        {/* 2. Main Store Interactive Content */}
+        <StoreMain />
+
+        {/* 3. Rich Footer */}
+        <Footer />
+
+        {/* 4. Interactive Full Product Detail Modal */}
+        <ProductDetailModal />
+
+        {/* 5. Wishlist Slide Drawer */}
+        <WishlistModal />
+
+        {/* 6. Checkout & Order Success Modal */}
+        <CheckoutModal />
+
+        {/* 7. Auth & Profile Modal */}
+        <AuthModal />
+
+        {/* 8. Order Tracking Modal */}
+        <OrderTrackingModal />
+
+        {/* 9. Mobile Bottom Sticky Navigation */}
+        <MobileBottomNav />
+      </div>
+    </ShopProvider>
+  );
+}
