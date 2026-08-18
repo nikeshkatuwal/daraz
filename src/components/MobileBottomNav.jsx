@@ -17,6 +17,15 @@ export default function MobileBottomNav({ onOpenMobileDrawer }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleCategoriesClick = () => {
+    if (onOpenMobileDrawer) {
+      onOpenMobileDrawer();
+    } else {
+      const el = document.getElementById('catalog-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const handleDealsClick = () => {
     const el = document.getElementById('flash-sale-section');
     if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -29,7 +38,7 @@ export default function MobileBottomNav({ onOpenMobileDrawer }) {
         <span>Home</span>
       </button>
 
-      <button type="button" className="mobile-nav-item" onClick={onOpenMobileDrawer}>
+      <button type="button" className="mobile-nav-item" onClick={handleCategoriesClick}>
         <LayoutGrid size={20} />
         <span>Categories</span>
       </button>

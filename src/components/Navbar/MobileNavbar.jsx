@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, ShoppingBag, Search, User, MapPin, Heart, Flame, Gift } from 'lucide-react';
+import { Menu, X, ShoppingBag, Search, User, MapPin, Heart, Flame, Gift, Truck } from 'lucide-react';
 import { categoriesData } from '../../data/mockData';
 import { useShop } from '../../context/ShopContext';
 
@@ -11,6 +11,7 @@ export default function MobileNavbar() {
     wishlist,
     setIsWishlistOpen,
     setIsAuthOpen,
+    setIsOrderTrackingOpen,
     user,
     searchQuery,
     setSearchQuery,
@@ -163,6 +164,17 @@ export default function MobileNavbar() {
             {/* Quick Links */}
             <div className="drawer-nav-section">
               <div className="drawer-section-heading">Quick Actions</div>
+              <button
+                type="button"
+                className="drawer-nav-item"
+                onClick={() => {
+                  setIsDrawerOpen(false);
+                  setIsOrderTrackingOpen(true);
+                }}
+              >
+                <Truck size={18} style={{ color: '#f57224' }} />
+                <span>Live Delivery Tracking 🛵</span>
+              </button>
               <button
                 type="button"
                 className="drawer-nav-item"
