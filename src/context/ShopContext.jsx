@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { allProducts, collectibleVouchers, locationsList, sampleCartItems } from '../data/mockData';
+import { defaultTrackingOrder, deliveryRiders } from '../data/trackingData';
 
 const ShopContext = createContext(null);
 
@@ -58,24 +59,8 @@ export function ShopProvider({ children }) {
   const [isOrderTrackingOpen, setIsOrderTrackingOpen] = useState(false);
   const [latestOrderPlaced, setLatestOrderPlaced] = useState(null);
 
-  // 8. Order History
-  const [orderHistory, setOrderHistory] = useState([
-    {
-      orderId: 'DZ-8942109',
-      date: 'Aug 12, 2026',
-      status: 'Out for Delivery',
-      deliveryEstimate: 'Today by 5:00 PM',
-      itemsCount: 2,
-      totalAmount: 6649,
-      paymentMethod: 'eSewa Mobile Wallet',
-      trackingSteps: [
-        { label: 'Order Placed', completed: true, time: 'Aug 12, 09:30 AM' },
-        { label: 'Packed & Dispatched', completed: true, time: 'Aug 13, 02:15 PM' },
-        { label: 'Out for Delivery', completed: true, time: 'Aug 14, 08:45 AM' },
-        { label: 'Delivered', completed: false, time: 'Expected by 5:00 PM' }
-      ]
-    }
-  ]);
+  // 8. Order History with Active Real-Time Courier Tracking
+  const [orderHistory, setOrderHistory] = useState([defaultTrackingOrder]);
 
   // 9. Toast Notification System
   const [toasts, setToasts] = useState([]);
@@ -215,7 +200,7 @@ export function ShopProvider({ children }) {
   };
 
   // Checkout & Order Placement
-  const placeOrder = ({ paymentMethod, deliveryAddress, contactPhone, notes }) => {
+  const placeOrder = ({ paymentMethod, deliveryAddress, contactPhone, notes, deliverySlot, coords }) => {
     const orderId = `DZ-${Math.floor(1000000 + Math.random() * 9000000)}`;
     const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -230,10 +215,12 @@ export function ShopProvider({ children }) {
 
     const shippingFee = subtotal >= 10000 ? 0 : 150;
     const finalTotal = Math.max(0, subtotal - voucherDiscount + shippingFee);
+    const assignedRider = deliveryRiders[Math.floor(Math.random() * deliveryRiders.length)];
+    const randomOtp = String(Math.floor(1000 + Math.random() * 9000));
 
     const newOrder = {
       orderId,
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      date: 'Today, ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       items: [...cart],
       itemsCount: cart.reduce((s, i) => s + i.quantity, 0),
       subtotal,
@@ -242,15 +229,19 @@ export function ShopProvider({ children }) {
       totalAmount: finalTotal,
       paymentMethod,
       deliveryAddress: deliveryAddress || currentLocation.area + ', ' + currentLocation.city,
-      deliveryEstimate: currentLocation.deliveryDays,
+      deliveryEstimate: deliverySlot || 'Arriving in ~20 mins (Express)',
       contactPhone: contactPhone || user.phone,
       notes,
-      status: 'Confirmed & Processing',
+      coords,
+      selectedCity: currentLocation.city || 'Kathmandu',
+      rider: assignedRider,
+      otpCode: randomOtp,
+      status: 'Out for Delivery',
       trackingSteps: [
-        { label: 'Order Confirmed', completed: true, time: 'Just now' },
-        { label: 'Packed & Quality Checked', completed: false, time: 'Pending' },
-        { label: 'Handed to Courier Express', completed: false, time: 'Pending' },
-        { label: 'Delivered', completed: false, time: currentLocation.deliveryDays }
+        { label: 'Order Confirmed & Verified', completed: true, time: 'Just now' },
+        { label: 'Packed & Dispatched from Hub', completed: true, time: '10 mins ago' },
+        { label: 'Out for Delivery (Rider en route)', completed: true, current: true, time: 'Active now' },
+        { label: 'Handover & Delivered', completed: false, time: 'Expected shortly' }
       ]
     };
 
@@ -258,9 +249,8 @@ export function ShopProvider({ children }) {
     setLatestOrderPlaced(newOrder);
     clearCart();
     setAppliedVoucherCode(null);
-    setIsCheckoutOpen(false);
 
-    showToast(`Order #${orderId} confirmed successfully! 🎉`, 'success');
+    showToast(`Order #${orderId} placed! Live delivery courier assigned 🛵`, 'success');
   };
 
   // Computed Cart Calculations
