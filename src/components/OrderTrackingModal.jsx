@@ -14,14 +14,20 @@ import {
   Copy,
   Sparkles,
   RefreshCw,
-  Award,
-  CreditCard,
-  ChevronDown,
-  Navigation
+  FileText,
+  Camera,
+  Volume2,
+  VolumeX,
+  Navigation,
+  ChevronRight
 } from 'lucide-react';
 import LiveDeliveryMap from './DeliveryMap/LiveDeliveryMap';
 import DeliveryChatModal from './DeliveryMap/DeliveryChatModal';
 import RiderCallModal from './DeliveryMap/RiderCallModal';
+import DeliveryInvoiceModal from './DeliveryMap/DeliveryInvoiceModal';
+import ProofOfDeliveryModal from './DeliveryMap/ProofOfDeliveryModal';
+import { soundManager } from '../utils/audioEffects';
+import { launchConfetti } from '../utils/confetti';
 import './DeliveryMap/DeliveryMap.css';
 
 export default function OrderTrackingModal() {
@@ -37,15 +43,24 @@ export default function OrderTrackingModal() {
   );
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isCallOpen, setIsCallOpen] = useState(false);
+  const [isInvoiceOpen, setIsInvoiceOpen] = useState(false);
+  const [isPodOpen, setIsPodOpen] = useState(false);
   const [selectedTip, setSelectedTip] = useState(null);
   const [riderRating, setRiderRating] = useState(5);
   const [hasRated, setHasRated] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+
+  // Simulated status override per order
+  const [statusOverrides, setStatusOverrides] = useState({});
 
   if (!isOrderTrackingOpen) return null;
 
   // Active selected order
-  const currentOrder =
+  const baseOrder =
     orderHistory.find((o) => o.orderId === selectedOrderId) || orderHistory[0] || {};
+
+  const activeStatus = statusOverrides[baseOrder.orderId] || baseOrder.status || 'Out for Delivery';
+  const currentOrder = { ...baseOrder, status: activeStatus };
 
   const rider = currentOrder.rider || {
     name: 'Bikash Shrestha',
@@ -56,24 +71,62 @@ export default function OrderTrackingModal() {
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
   };
 
-  const isLiveTrackingActive =
-    currentOrder.status === 'Out for Delivery' ||
-    currentOrder.status === 'Confirmed & Processing' ||
-    !currentOrder.status;
+  const isLiveTrackingActive = currentOrder.status === 'Out for Delivery';
+  const isDelivered = currentOrder.status === 'Delivered';
 
   const handleCopyOTP = (code) => {
     navigator.clipboard?.writeText(code || '4821');
+    soundManager.playPop();
     showToast('Delivery OTP copied to clipboard!', 'info');
   };
 
   const handleTipRider = (amount) => {
     setSelectedTip(amount);
+    soundManager.playSuccessFanfare();
     showToast(`Rs. ${amount} tip added for ${rider.name}! Thank you! ❤️`, 'success');
   };
 
   const handleSubmitRating = () => {
     setHasRated(true);
+    soundManager.playSuccessFanfare();
     showToast(`Thank you for rating ${rider.name} ${riderRating} Stars! ⭐`, 'success');
+  };
+
+  const toggleAudio = () => {
+    const muted = soundManager.toggleMute();
+    setIsMuted(muted);
+    showToast(muted ? 'Sound effects muted 🔇' : 'Sound effects enabled 🔊', 'info');
+  };
+
+  // Cycle delivery stages for testing/simulation
+  const handleCycleStage = () => {
+    const stages = [
+      'Order Confirmed & Processing',
+      'Packed & Quality Checked',
+      'Dispatched from Hub',
+      'Out for Delivery',
+      'Delivered'
+    ];
+    const currentIndex = stages.indexOf(activeStatus);
+    const nextIndex = (currentIndex + 1) % stages.length;
+    const nextStatus = stages[nextIndex];
+
+    setStatusOverrides((prev) => ({
+      ...prev,
+      [baseOrder.orderId]: nextStatus
+    }));
+
+    if (nextStatus === 'Delivered') {
+      soundManager.playDoorbell();
+      launchConfetti();
+      showToast(`🎉 Order #${baseOrder.orderId} marked as Delivered! Doorstep photo & AWB ready.`, 'success');
+    } else if (nextStatus === 'Out for Delivery') {
+      soundManager.playRadarBeep();
+      showToast(`🛵 Courier Hero ${rider.name} is now en route with live GPS!`, 'info');
+    } else {
+      soundManager.playPop();
+      showToast(`Status updated to: ${nextStatus}`, 'info');
+    }
   };
 
   return (
@@ -90,17 +143,27 @@ export default function OrderTrackingModal() {
             </div>
             <div>
               <h2>Live Delivery & Order Tracker</h2>
-              <p className="drawer-subheading">Real-time GPS route tracking and courier updates</p>
+              <p className="drawer-subheading">Real-time GPS route tracking & airway bill</p>
             </div>
           </div>
-          <button
-            type="button"
-            className="drawer-close-btn"
-            onClick={() => setIsOrderTrackingOpen(false)}
-            aria-label="Close"
-          >
-            <X size={20} />
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button
+              type="button"
+              className="drawer-audio-btn"
+              onClick={toggleAudio}
+              title={isMuted ? 'Unmute Audio' : 'Mute Audio'}
+            >
+              {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} style={{ color: '#f57224' }} />}
+            </button>
+            <button
+              type="button"
+              className="drawer-close-btn"
+              onClick={() => setIsOrderTrackingOpen(false)}
+              aria-label="Close"
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* Orders Switcher Tabs if multiple orders */}
@@ -116,7 +179,7 @@ export default function OrderTrackingModal() {
                   onClick={() => setSelectedOrderId(ord.orderId)}
                 >
                   <span className="tab-ord-id">#{ord.orderId}</span>
-                  <span className="tab-ord-status">{ord.status}</span>
+                  <span className="tab-ord-status">{statusOverrides[ord.orderId] || ord.status}</span>
                 </button>
               ))}
             </div>
@@ -133,7 +196,22 @@ export default function OrderTrackingModal() {
             </div>
           ) : (
             <div className="tracking-main-content">
-              {/* 1. Live Map Section (Only for active deliveries) */}
+              {/* Simulator Action Strip */}
+              <div className="stage-simulator-banner">
+                <div className="simulator-label-wrap">
+                  <Sparkles size={14} style={{ color: '#f57224' }} />
+                  <span>Interactive Courier Simulator:</span>
+                </div>
+                <button
+                  type="button"
+                  className="btn-next-stage-pill"
+                  onClick={handleCycleStage}
+                >
+                  Simulate Next Stage <ChevronRight size={14} />
+                </button>
+              </div>
+
+              {/* 1. Live Map Section (Active during Out for Delivery) */}
               {isLiveTrackingActive && (
                 <div className="tracking-map-container-card">
                   <div className="map-card-header">
@@ -149,9 +227,36 @@ export default function OrderTrackingModal() {
                   <LiveDeliveryMap
                     cityName={currentOrder.selectedCity || 'Kathmandu'}
                     riderInfo={rider}
-                    onOpenChat={() => setIsChatOpen(true)}
-                    onOpenCall={() => setIsCallOpen(true)}
                   />
+                </div>
+              )}
+
+              {/* Delivered Celebration Card if Delivered */}
+              {isDelivered && (
+                <div className="delivered-banner-card">
+                  <div className="delivered-badge-circle">
+                    <CheckCircle2 size={32} />
+                  </div>
+                  <div className="delivered-text-content">
+                    <h4>Package Successfully Delivered!</h4>
+                    <p>Delivered to {currentOrder.deliveryAddress} • Signed by customer</p>
+                  </div>
+                  <div className="delivered-action-btns">
+                    <button
+                      type="button"
+                      className="btn-pod-action"
+                      onClick={() => setIsPodOpen(true)}
+                    >
+                      <Camera size={14} /> Proof of Delivery (POD)
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-invoice-action-pill"
+                      onClick={() => setIsInvoiceOpen(true)}
+                    >
+                      <FileText size={14} /> Tax Invoice & AWB
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -168,7 +273,7 @@ export default function OrderTrackingModal() {
                       <h4 className="rider-name-heading">{rider.name}</h4>
                       <div className="rider-badges-line">
                         <span className="rating-badge">
-                          <Star size={12} fill="#b45309" color="#b45309" /> {rider.rating || '4.9'}
+                          <Star size={12} fill="#b45309" color="#b45309" /> {rider.rating || '4.95'}
                         </span>
                         <span>•</span>
                         <span>{rider.vehicle} ({rider.plateNumber})</span>
@@ -249,6 +354,28 @@ export default function OrderTrackingModal() {
                     <span>Payment:</span>
                     <span>{currentOrder.paymentMethod}</span>
                   </div>
+                </div>
+
+                {/* Document Downloads Action Row */}
+                <div className="tracking-docs-row">
+                  <button
+                    type="button"
+                    className="btn-doc-download"
+                    onClick={() => setIsInvoiceOpen(true)}
+                  >
+                    <FileText size={14} style={{ color: '#f57224' }} />
+                    <span>Download Tax Invoice (AWB)</span>
+                  </button>
+                  {isDelivered && (
+                    <button
+                      type="button"
+                      className="btn-doc-download"
+                      onClick={() => setIsPodOpen(true)}
+                    >
+                      <Camera size={14} style={{ color: '#10b981' }} />
+                      <span>View Delivery Proof (POD)</span>
+                    </button>
+                  )}
                 </div>
 
                 {/* Tracking Stepper */}
@@ -379,6 +506,20 @@ export default function OrderTrackingModal() {
           isOpen={isCallOpen}
           onClose={() => setIsCallOpen(false)}
           rider={rider}
+        />
+
+        {/* Official Tax Invoice & Airway Bill Modal */}
+        <DeliveryInvoiceModal
+          isOpen={isInvoiceOpen}
+          onClose={() => setIsInvoiceOpen(false)}
+          order={currentOrder}
+        />
+
+        {/* Proof of Delivery Photo & Signature Modal */}
+        <ProofOfDeliveryModal
+          isOpen={isPodOpen}
+          onClose={() => setIsPodOpen(false)}
+          order={currentOrder}
         />
       </div>
     </div>
