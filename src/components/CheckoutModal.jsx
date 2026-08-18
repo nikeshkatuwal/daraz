@@ -10,8 +10,13 @@ import {
   MapPin,
   ArrowRight,
   Sparkles,
-  ShoppingBag
+  ShoppingBag,
+  Clock,
+  Zap,
+  Navigation,
+  Truck
 } from 'lucide-react';
+import AddressMapPicker from './DeliveryMap/AddressMapPicker';
 
 export default function CheckoutModal() {
   const {
@@ -31,14 +36,18 @@ export default function CheckoutModal() {
     isCheckoutOpen,
     setIsCheckoutOpen,
     latestOrderPlaced,
-    setLatestOrderPlaced
+    setLatestOrderPlaced,
+    setIsOrderTrackingOpen
   } = useShop();
 
   const [paymentMethod, setPaymentMethod] = useState('esewa');
+  const [deliverySlot, setDeliverySlot] = useState('⚡ Express Priority (20-30 Mins)');
   const [voucherInput, setVoucherInput] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState(
     `${currentLocation.area}, ${currentLocation.city}, Nepal`
   );
+  const [pinnedCoords, setPinnedCoords] = useState(null);
+  const [isMapPickerOpen, setIsMapPickerOpen] = useState(false);
   const [phone, setPhone] = useState(user?.phone || '+977 9841-234567');
   const [orderNotes, setOrderNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -62,7 +71,9 @@ export default function CheckoutModal() {
         paymentMethod: paymentLabel,
         deliveryAddress,
         contactPhone: phone,
-        notes: orderNotes
+        notes: orderNotes,
+        deliverySlot,
+        coords: pinnedCoords
       });
       setIsSubmitting(false);
     }, 900);
@@ -80,6 +91,12 @@ export default function CheckoutModal() {
     setLatestOrderPlaced(null);
   };
 
+  const handleOpenLiveTracking = () => {
+    setIsCheckoutOpen(false);
+    setLatestOrderPlaced(null);
+    setIsOrderTrackingOpen(true);
+  };
+
   // 1. Order Success Screen
   if (latestOrderPlaced) {
     return (
@@ -90,13 +107,13 @@ export default function CheckoutModal() {
           </div>
           <h2>Thank You! Order Confirmed</h2>
           <p className="success-subtitle">
-            Your order has been placed and is being prepared for express delivery.
+            Your package has been dispatched and assigned to a Daraz Express Hero Courier!
           </p>
 
           <div className="order-receipt-box">
             <div className="receipt-row">
               <span>Order Tracking ID:</span>
-              <strong>{latestOrderPlaced.orderId}</strong>
+              <strong>#{latestOrderPlaced.orderId}</strong>
             </div>
             <div className="receipt-row">
               <span>Estimated Delivery:</span>
@@ -107,18 +124,33 @@ export default function CheckoutModal() {
               <span>{latestOrderPlaced.deliveryAddress}</span>
             </div>
             <div className="receipt-row">
+              <span>Courier Hero:</span>
+              <span>{latestOrderPlaced.rider?.name || 'Bikash Shrestha'} ({latestOrderPlaced.rider?.plateNumber || 'BA 99 PA 4201'})</span>
+            </div>
+            <div className="receipt-row">
+              <span>Handover OTP:</span>
+              <strong style={{ color: '#f57224', letterSpacing: 2 }}>{latestOrderPlaced.otpCode || '4821'}</strong>
+            </div>
+            <div className="receipt-row">
               <span>Payment Method:</span>
               <span>{latestOrderPlaced.paymentMethod}</span>
             </div>
             <div className="receipt-divider" />
             <div className="receipt-row total-highlight">
               <span>Total Paid:</span>
-              <span>Rs. {latestOrderPlaced.totalAmount.toLocaleString()}</span>
+              <span>Rs. {latestOrderPlaced.totalAmount?.toLocaleString()}</span>
             </div>
           </div>
 
           <div className="success-actions">
-            <button type="button" className="btn-success-primary" onClick={handleClose}>
+            <button
+              type="button"
+              className="btn-success-primary track-live-btn"
+              onClick={handleOpenLiveTracking}
+            >
+              <Navigation size={18} /> Track Live Rider on Map
+            </button>
+            <button type="button" className="btn-success-secondary" onClick={handleClose}>
               Continue Shopping
             </button>
           </div>
@@ -137,7 +169,7 @@ export default function CheckoutModal() {
             <ShoppingBag size={22} style={{ color: '#f57224' }} />
             <div>
               <h2>Daraz Express Checkout</h2>
-              <p>Review items, apply vouchers and select secure payment</p>
+              <p>Review items, pinpoint delivery address, and select payment</p>
             </div>
           </div>
           <button type="button" className="modal-close-round-btn" onClick={handleClose}>
@@ -150,9 +182,18 @@ export default function CheckoutModal() {
           <div className="checkout-main-form">
             {/* Delivery Address Box */}
             <div className="checkout-section-card">
-              <div className="section-title-row">
-                <MapPin size={18} style={{ color: '#f57224' }} />
-                <h3>1. Delivery Address & Contact</h3>
+              <div className="section-title-row" style={{ justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <MapPin size={18} style={{ color: '#f57224' }} />
+                  <h3>1. Delivery Address & Pinpoint</h3>
+                </div>
+                <button
+                  type="button"
+                  className="btn-open-map-picker"
+                  onClick={() => setIsMapPickerOpen(true)}
+                >
+                  <Navigation size={14} /> Pin on Map
+                </button>
               </div>
 
               <div className="form-group-row">
@@ -165,6 +206,42 @@ export default function CheckoutModal() {
                     onChange={(e) => setDeliveryAddress(e.target.value)}
                     placeholder="House no, Street, Landmark"
                   />
+                </div>
+              </div>
+
+              {/* Delivery Speed / Slot Selector */}
+              <div className="form-field delivery-slots-field">
+                <label>Delivery Speed & Time Slot</label>
+                <div className="delivery-slots-grid">
+                  {[
+                    {
+                      id: 'express',
+                      title: '⚡ 20-30 Mins Express',
+                      desc: 'HyperLocal priority dispatch',
+                      value: '⚡ Express Priority (20-30 Mins)'
+                    },
+                    {
+                      id: 'standard',
+                      title: '📦 Standard Next-Day',
+                      desc: 'Daraz Express van delivery',
+                      value: 'Standard Next-Day Express'
+                    },
+                    {
+                      id: 'evening',
+                      title: '🌙 Evening Slot (5 - 8 PM)',
+                      desc: 'Convenient after-office delivery',
+                      value: 'Evening Slot (5:00 - 8:00 PM)'
+                    }
+                  ].map((slot) => (
+                    <div
+                      key={slot.id}
+                      className={`slot-card ${deliverySlot === slot.value ? 'selected' : ''}`}
+                      onClick={() => setDeliverySlot(slot.value)}
+                    >
+                      <strong>{slot.title}</strong>
+                      <span>{slot.desc}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -186,12 +263,12 @@ export default function CheckoutModal() {
               </div>
 
               <div className="form-field">
-                <label>Delivery Instructions (Optional)</label>
+                <label>Delivery Notes for Courier Hero (Optional)</label>
                 <input
                   type="text"
                   value={orderNotes}
                   onChange={(e) => setOrderNotes(e.target.value)}
-                  placeholder="e.g. Call before delivery, leave with security"
+                  placeholder="e.g. Call before delivery, gate code 4092, leave with security"
                 />
               </div>
             </div>
@@ -401,7 +478,7 @@ export default function CheckoutModal() {
                 disabled={isSubmitting || cart.length === 0}
               >
                 {isSubmitting ? (
-                  'Securing Order...'
+                  'Assigning Express Courier...'
                 ) : (
                   <>
                     Confirm & Place Order <ArrowRight size={18} />
@@ -416,6 +493,17 @@ export default function CheckoutModal() {
             </div>
           </div>
         </form>
+
+        {/* Pinpoint Address Map Picker Modal */}
+        <AddressMapPicker
+          isOpen={isMapPickerOpen}
+          onClose={() => setIsMapPickerOpen(false)}
+          initialAddress={deliveryAddress}
+          onConfirmLocation={({ address, coords }) => {
+            setDeliveryAddress(address);
+            setPinnedCoords(coords);
+          }}
+        />
       </div>
     </div>
   );

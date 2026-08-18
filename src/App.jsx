@@ -10,6 +10,7 @@ import WishlistModal from './components/WishlistModal';
 import CheckoutModal from './components/CheckoutModal';
 import AuthModal from './components/AuthModal';
 import OrderTrackingModal from './components/OrderTrackingModal';
+import FloatingDeliveryTracker from './components/DeliveryMap/FloatingDeliveryTracker';
 import ToastNotification from './components/ToastNotification';
 import MobileBottomNav from './components/MobileBottomNav';
 import { categoriesData, partnerBrands, customerReviews } from './data/mockData';
@@ -441,7 +442,10 @@ export default function App() {
         {/* 8. Order Tracking Modal */}
         <OrderTrackingModal />
 
-        {/* 9. Mobile Bottom Sticky Navigation */}
+        {/* 9. Floating Live Courier Radar Tracker */}
+        <FloatingDeliveryTracker />
+
+        {/* 10. Mobile Bottom Sticky Navigation */}
         <MobileBottomNav />
       </div>
     </ShopProvider>
