@@ -511,27 +511,633 @@
   flex-wrap: wrap;
 }
 
-.security-otp-label {
+/* Simulator Banner & Action Strip */
+.stage-simulator-banner {
+  background: linear-gradient(135deg, #fff2eb 0%, #ffedd5 100%);
+  border: 1px dashed #fed7aa;
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.simulator-label-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #9a3412;
+}
+
+.btn-next-stage-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #f57224;
+  color: white;
+  border: none;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(245, 114, 36, 0.3);
+  transition: all 0.2s;
+}
+
+.btn-next-stage-pill:hover {
+  background: #ea580c;
+  transform: translateX(1px);
+}
+
+.drawer-audio-btn {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.drawer-audio-btn:hover {
+  background: #e2e8f0;
+}
+
+/* Delivered Card */
+.delivered-banner-card {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 1px solid #a7f3d0;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+}
+
+.delivered-badge-circle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #10b981;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+}
+
+.delivered-text-content h4 {
+  margin: 0 0 2px 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #065f46;
+}
+
+.delivered-text-content p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #047857;
+}
+
+.delivered-action-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.btn-pod-action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #059669;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-invoice-action-pill {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: white;
+  border: 1px solid #059669;
+  color: #059669;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tracking-docs-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.btn-doc-download {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-doc-download:hover {
+  background: white;
+  border-color: #f57224;
+  color: #f57224;
+}
+
+/* ============================================================
+   TAX INVOICE & AIRWAY BILL MODAL
+   ============================================================ */
+.invoice-modal-backdrop {
+  z-index: 1300;
+}
+
+.invoice-modal-card {
+  width: 95%;
+  max-width: 760px;
+  max-height: 92vh;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.invoice-toolbar {
+  padding: 12px 18px;
+  background: #0f172a;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.invoice-toolbar-title {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.invoice-toolbar-btns {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-invoice-action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f57224;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-close-invoice {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.invoice-sheet-container {
+  padding: 24px;
+  overflow-y: auto;
+  font-family: 'Inter', sans-serif;
+  color: #1e293b;
+  background: white;
+}
+
+.inv-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.inv-brand-name {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.inv-brand-name span {
+  color: #f57224;
+}
+
+.inv-tagline {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
   color: #475569;
+}
+
+.inv-vat-pan {
+  display: block;
+  font-size: 0.74rem;
+  color: #64748b;
+}
+
+.inv-awb-barcode-box {
+  text-align: right;
+}
+
+.fake-barcode-lines {
+  font-family: monospace;
+  font-size: 1rem;
+  letter-spacing: 1px;
+  color: #0f172a;
+}
+
+.inv-tracking-code {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.inv-status-stamp {
+  display: inline-block;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.inv-divider-thick {
+  height: 2px;
+  background: #0f172a;
+  margin: 16px 0;
+}
+
+.inv-parties-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.inv-party-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 0.78rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.inv-party-label {
+  font-weight: 800;
+  color: #64748b;
+  font-size: 0.7rem;
+  margin-bottom: 2px;
+}
+
+.inv-party-card strong {
+  font-size: 0.86rem;
+  color: #0f172a;
+}
+
+.inv-courier-meta-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.76rem;
+  margin-bottom: 16px;
+}
+
+.inv-courier-meta-row span {
+  display: block;
+  color: #9a3412;
+  font-size: 0.7rem;
+}
+
+.inv-courier-meta-row strong {
+  color: #0f172a;
+}
+
+.inv-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+}
+
+.inv-items-table th {
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.inv-items-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.78rem;
+  color: #334155;
+}
+
+.inv-item-sub {
+  display: block;
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+.inv-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 14px;
+}
+
+.inv-qr-col {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.74rem;
+  color: #64748b;
+}
+
+.inv-qr-code {
+  width: 70px;
+  height: 70px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}
+
+.inv-calc-col {
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   font-size: 0.8rem;
 }
 
-.otp-number-highlight {
-  font-family: monospace;
-  font-size: 1.15rem;
-  font-weight: 800;
-  letter-spacing: 2px;
+.inv-calc-row {
+  display: flex;
+  justify-content: space-between;
+  color: #475569;
+}
+
+.inv-calc-row.grand-total {
+  font-size: 1rem;
+  font-weight: 900;
+  color: #f57224;
+  border-top: 1px solid #cbd5e1;
+  padding-top: 6px;
+  margin-top: 4px;
+}
+
+.inv-footer-notes {
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px dashed #cbd5e1;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  text-align: center;
+}
+
+/* ============================================================
+   PROOF OF DELIVERY (POD) MODAL
+   ============================================================ */
+.pod-modal-backdrop {
+  z-index: 1300;
+}
+
+.pod-card-container {
+  width: 94%;
+  max-width: 520px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 90vh;
+}
+
+.pod-header {
+  padding: 14px 18px;
   background: #0f172a;
-  color: #fbbf24;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pod-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pod-title-group h3 {
+  margin: 0;
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.pod-title-group p {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.btn-close-pod {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.pod-body {
+  padding: 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pod-photo-box {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.pod-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pod-photo-overlay-tag {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(15, 23, 42, 0.85);
+  color: white;
+  font-size: 0.72rem;
+  font-weight: 700;
   padding: 4px 10px;
   border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  gap: 6px;
+}
+
+.pod-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.pod-detail-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+}
+
+.pod-detail-item span {
+  display: block;
+  font-size: 0.68rem;
+  color: #64748b;
+}
+
+.pod-detail-item strong {
+  color: #0f172a;
+}
+
+.pod-courier-sign-off {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.76rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pod-courier-sign-off span {
+  color: #9a3412;
+}
+
+.pod-footer {
+  padding: 12px 18px;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn-pod-done {
+  width: 100%;
+  background: #0f172a;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.84rem;
+  cursor: pointer;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-invoice, #printable-invoice * {
+    visibility: visible;
+  }
+  #printable-invoice {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0;
+  }
+  .no-print {
+    display: none !important;
+  }
 }
 
 /* 8. Floating Live Delivery Tracker Pill */

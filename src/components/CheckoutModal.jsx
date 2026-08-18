@@ -17,6 +17,8 @@ import {
   Truck
 } from 'lucide-react';
 import AddressMapPicker from './DeliveryMap/AddressMapPicker';
+import { soundManager } from '../utils/audioEffects';
+import { launchConfetti } from '../utils/confetti';
 
 export default function CheckoutModal() {
   const {
@@ -75,6 +77,8 @@ export default function CheckoutModal() {
         deliverySlot,
         coords: pinnedCoords
       });
+      soundManager.playSuccessFanfare();
+      launchConfetti();
       setIsSubmitting(false);
     }, 900);
   };
